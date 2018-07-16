@@ -11,7 +11,7 @@ with open('C:\\Users\\p_sanderson\\Documents\\All Crestron Code\\APPLE\\WF01\\Pe
 
 # "C:\Users\p_sanderson\Documents\Powershell_Crestron_Scripts\devices-ip.csv"
 
-f = open('C:\\Users\\p_sanderson\\Documents\\Powershell_Crestron_Scripts\\devices-ip.csv', 'r') #open file
+f = open('C:\\Users\\p_sanderson\\Documents\\Powershell_Crestron_Scripts\\crestronEDK-scripts\\devices-ip.csv', 'r') #open file
 try:
     r = csv.reader(f) #init csv reader
     for row in r:
