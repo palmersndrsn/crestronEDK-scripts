@@ -26,7 +26,7 @@ $devs = Get-AutoDiscovery |
 
 # start the jobs
 write-host 'starting script block'
-$password = "coitcom123"
+$password = "coitcom" #need to ask user in console window
 $devs | Invoke-RunspaceJob -SharedVariables password -ScriptBlock {
     write-host 'in script block sending fw'
     # need to check if its $_ or $_.IPAddress that worked.

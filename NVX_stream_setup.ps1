@@ -43,6 +43,7 @@ foreach ($d in $devs)
         {
             Invoke-CrestronCommand -Device $d.Device -Command 
         }
+
     }
 }
 
