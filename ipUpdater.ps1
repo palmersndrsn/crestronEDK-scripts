@@ -25,7 +25,7 @@ foreach ($d in $devs)
 {
     function Get-reboot_device
     {
-        start-sleep 5
+        start-sleep 2
         if($d.username-and$d.password)
         {
             Write-Host "rebooting $($d.Room_Name)..."
