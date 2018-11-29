@@ -25,6 +25,12 @@ foreach ($d in $devs)
 {
     function Get-reboot_device
     {
+        start-sleep 5
+        if($d.username-and$d.password)
+        {
+            Write-Host "rebooting $($d.Room_Name)..."
+            Invoke-CrestronCommand -Device $d.Device -Command "reboot" -username $d.username -secure -password $d.password -Timeout 20
+        }
         # reboot to complete
         Write-Host "rebooting $($d.Room_Name)..."
         Invoke-CrestronCommand -Device $d.Device -Command "reboot" -Timeout 20
@@ -34,7 +40,7 @@ foreach ($d in $devs)
     {
         write-host "Beginning: $($d.device),$($d.Description),$($d.Room_Name)..."
         # checks if the device is a processor
-        if($d.Description.StartsWith("RMC3")-Or$d.Description.StartsWith("DMPS")-or$d.Description.StartsWith("CP3")-or$d.Description.StartsWith("DM-NVX"))
+        if($d.Description.StartsWith("RMC3")-Or$d.Description.StartsWith("DMPS")-or$d.Description.StartsWith("CP3"))
         {
             # checks if there is a config file to push
             if($d.config_file_name-and$d.config_file_path)
