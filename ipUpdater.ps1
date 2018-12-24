@@ -13,11 +13,11 @@ Import-Module PSCrestron
 
 # build configs
 Write-Host "building avaliable configs..."
-py "C:\Users\p_sanderson\Documents\Python_Scripts\config_file_editor.py"\
+# py "C:\Users\p_sanderson\Documents\Python_Scripts\config_file_editor.py"\
 
 # get the device list
 Write-Host 'Getting the device list...'
-$devs = Import-Csv (Join-Path $PSScriptRoot 'devices-ip.csv')
+$devs = Import-Csv (Join-Path $PSScriptRoot 'devices-ip.csv') 
 
 
 # iterate the devices in order
@@ -31,9 +31,12 @@ foreach ($d in $devs)
             Write-Host "rebooting $($d.Room_Name)..."
             Invoke-CrestronCommand -Device $d.Device -Command "reboot" -username $d.username -secure -password $d.password -Timeout 20
         }
-        # reboot to complete
-        Write-Host "rebooting $($d.Room_Name)..."
-        Invoke-CrestronCommand -Device $d.Device -Command "reboot" -Timeout 20
+        else {
+            # reboot to complete
+            Write-Host "rebooting $($d.Room_Name)..."
+            Invoke-CrestronCommand -Device $d.Device -Command "reboot" -secure -Timeout 20
+            
+        }
     }
     # checks for device
     if($d.Device)
@@ -43,19 +46,20 @@ foreach ($d in $devs)
         if($d.Description.StartsWith("RMC3")-Or$d.Description.StartsWith("DMPS")-or$d.Description.StartsWith("CP3"))
         {
             # checks if there is a config file to push
-            if($d.config_file_name-and$d.config_file_path)
+            if($d.config_file_name)
             {
                 if($d.program_name)
                 {
                     # makes folder if required
-                    Invoke-CrestronCommand -Device $d.Device -Command "MAKEDIR nvram\\$($d.program_name)" -Timeout 20
+                    Invoke-CrestronCommand -Device $d.Device -Command "MAKEDIR nvram\\$($d.program_name)" -secure -Timeout 20
                     # send config to that folder
-                    Send-FTPFile -Device $d.Device -LocalFile "$($d.config_file_path)-$($d.Room_Number).json" -RemoteFile "\\NVRAM\\$($d.program_name)\\$($d.config_file_name)" # -Timeout 60
-                    Write-Host "Sending Config $($d.config_file_name) to $($d.program_name)"
+                    Send-FTPFile -Device $d.Device -LocalFile (Join-Path $PSScriptRoot "\\$($d.config_file_name)-$($d.Room_Number).json") -secure -RemoteFile "\\NVRAM\\$($d.program_name)\\$($d.config_file_name)-$($d.Room_Number).json" # -Timeout 60
+                    Write-Host "Sending Config $($d.config_file_name)-$($d.Room_Number).json to $($d.program_name)"
                 } else {
                     # send config to root folder
-                    Send-FTPFile -Device $d.Device -LocalFile "$($d.config_file_path)-$($d.Room_Number).json" -RemoteFile "\\NVRAM\\$($d.config_file_name)" # -Timeout 60
-                    Write-Host "Sending Config $($d.config_file_name) to NVRAM"
+                    write-host
+                    Send-FTPFile -Device $d.Device -LocalFile (Join-Path $PSScriptRoot "\\$($d.config_file_name)-$($d.Room_Number).json") -secure -RemoteFile "\\NVRAM\\$($d.config_file_name)-$($d.Room_Number).json" # -Timeout 60
+                    Write-Host (Join-Path $PSScriptRoot "\\$($d.config_file_name)-$($d.Room_Number).json to NVRAM")
                 }
                 start-sleep 5
             }
@@ -125,21 +129,21 @@ foreach ($d in $devs)
         {
             # turn off dhcp
             Write-Host "Updating IP $($d.Device) to $($d.Room_Name)..."
-            Invoke-CrestronCommand -Device $d.Device -Command "dhcp$zero off"  -Timeout 20
+            Invoke-CrestronCommand -Device $d.Device -Command "dhcp$zero off" -secure -Timeout 20
             write-host "dhcp $zero off"
             # set ip
-            Invoke-CrestronCommand -Device $d.Device -Command "ipa$zero $($d.IP)"   -Timeout 20
+            Invoke-CrestronCommand -Device $d.Device -Command "ipa$zero $($d.IP)" -secure  -Timeout 20
             write-host "ipa $zero $($d.IP)"
             # set subnet
-            Invoke-CrestronCommand -Device $d.Device -Command "ipmask$zero $($d.Subnet)" -Timeout 20
+            Invoke-CrestronCommand -Device $d.Device -Command "ipmask$zero $($d.Subnet)" -secure -Timeout 20
             write-host "ipmask $zero $($d.Subnet)"
             # set gateway
-            Invoke-CrestronCommand -Device $d.Device -Command "defr$zero $($d.Gateway)"  -Timeout 20
+            Invoke-CrestronCommand -Device $d.Device -Command "defr$zero $($d.Gateway)" -secure  -Timeout 20
             write-host "defr $zero $($d.Gateway)"
             # check for host
             if($d.Hostname)
             {
-                Invoke-CrestronCommand -Device $d.Device -Command "hostname $($d.Hostname)" -Timeout 20
+                Invoke-CrestronCommand -Device $d.Device -Command "hostname $($d.Hostname)" -secure -Timeout 20
                 Write-Host "Hostname Set $($d.Hostname)"
             }
             Get-reboot_device

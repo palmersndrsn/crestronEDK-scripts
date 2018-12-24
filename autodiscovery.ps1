@@ -15,9 +15,11 @@ Set-StrictMode -Version Latest
 # import the module
 Import-Module PSCrestron
 
-$DesktopPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop)
+write-host 'beginning auto discovery'
 
-Get-AutoDiscovery | export-csv $DesktopPath"\auto_discovery_results.csv"
+# $DesktopPath = [System.Environment]::GetFolderPath([System.Environment+SpecialFolder]::Desktop)
+
+Get-AutoDiscovery | export-csv $PSScriptRoot"\auto_discovery_results.csv"
 
 Write-Host 'Done.'
 
