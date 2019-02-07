@@ -28,20 +28,25 @@ foreach ($d in $devs)
         start-sleep 2
         if($d.username-and$d.password)
         {
-            Write-Host "rebooting $($d.Room_Name)..."
+            Write-Host "rebooting $($d.Room_Number)..."
             Invoke-CrestronCommand -Device $d.Device -Command "reboot" -username $d.username -secure -password $d.password -Timeout 20
+        }
+        elseif  ($d.Description.StartsWith("DM-")) {
+            # reboot to complete
+            Write-Host "rebooting $($d.Room_Number)..."
+            Invoke-CrestronCommand -Device $d.Device -Command "reboot"  -Timeout 20
+            
         }
         else {
             # reboot to complete
-            Write-Host "rebooting $($d.Room_Name)..."
+            Write-Host "rebooting $($d.Room_Number)..."
             Invoke-CrestronCommand -Device $d.Device -Command "reboot" -secure -Timeout 20
-            
         }
     }
     # checks for device
     if($d.Device)
     {
-        write-host "Beginning: $($d.device),$($d.Description),$($d.Room_Name)..."
+        write-host "Beginning: $($d.device),$($d.Description),$($d.Room_Number)..."
         # checks if the device is a processor
         if($d.Description.StartsWith("RMC3")-Or$d.Description.StartsWith("DMPS")-or$d.Description.StartsWith("CP3"))
         {
@@ -103,7 +108,7 @@ foreach ($d in $devs)
         if ($d.IP-and$d.Subnet-and$d.Gateway-and$d.username-and$d.password)
         {
             # turn off dhcp
-            write-Host "Updating IP $($d.Device) to $($d.Room_Name)..."
+            write-Host "Updating IP $($d.Device) to $($d.Room_Number)..."
             Invoke-CrestronCommand -Device $d.Device -Command "dhcp off" -username $d.username -secure -password $d.password -Timeout 20
             write-host "dhcp off"
             # set ip
@@ -127,25 +132,48 @@ foreach ($d in $devs)
         # not secure network config
         elseif($d.IP-and$d.Subnet-and$d.Gateway)
         {
-            # turn off dhcp
-            Write-Host "Updating IP $($d.Device) to $($d.Room_Name)..."
-            Invoke-CrestronCommand -Device $d.Device -Command "dhcp$zero off" -secure -Timeout 20
-            write-host "dhcp $zero off"
-            # set ip
-            Invoke-CrestronCommand -Device $d.Device -Command "ipa$zero $($d.IP)" -secure  -Timeout 20
-            write-host "ipa $zero $($d.IP)"
-            # set subnet
-            Invoke-CrestronCommand -Device $d.Device -Command "ipmask$zero $($d.Subnet)" -secure -Timeout 20
-            write-host "ipmask $zero $($d.Subnet)"
-            # set gateway
-            Invoke-CrestronCommand -Device $d.Device -Command "defr$zero $($d.Gateway)" -secure  -Timeout 20
-            write-host "defr $zero $($d.Gateway)"
-            # check for host
-            if($d.Hostname)
-            {
-                Invoke-CrestronCommand -Device $d.Device -Command "hostname $($d.Hostname)" -secure -Timeout 20
-                Write-Host "Hostname Set $($d.Hostname)"
+            if  ($d.Description.StartsWith("DM-")) {
+                Write-Host "Updating IP $($d.Device) to $($d.Room_Number)..."
+                Invoke-CrestronCommand -Device $d.Device -Command "dhcp$zero off"  -Timeout 20
+                write-host "dhcp $zero off"
+                # set ip
+                Invoke-CrestronCommand -Device $d.Device -Command "ipa$zero $($d.IP)"  -Timeout 20
+                write-host "ipa $zero $($d.IP)"
+                # set subnet
+                Invoke-CrestronCommand -Device $d.Device -Command "ipmask$zero $($d.Subnet)" -Timeout 20
+                write-host "ipmask $zero $($d.Subnet)"
+                # set gateway
+                Invoke-CrestronCommand -Device $d.Device -Command "defr$zero $($d.Gateway)"   -Timeout 20
+                write-host "defr $zero $($d.Gateway)"
+                # check for host
+                if($d.Hostname)
+                {
+                    Invoke-CrestronCommand -Device $d.Device -Command "hostname $($d.Hostname)"  -Timeout 20
+                    Write-Host "Hostname Set $($d.Hostname)"
+                }
+                
             }
+            else {
+                Write-Host "Updating IP $($d.Device) to $($d.Room_Number)..."
+                Invoke-CrestronCommand -Device $d.Device -Command "dhcp$zero off" -secure -Timeout 20
+                write-host "dhcp $zero off"
+                # set ip
+                Invoke-CrestronCommand -Device $d.Device -Command "ipa$zero $($d.IP)" -secure -Timeout 20
+                write-host "ipa $zero $($d.IP)"
+                # set subnet
+                Invoke-CrestronCommand -Device $d.Device -Command "ipmask$zero $($d.Subnet)" -secure -Timeout 20
+                write-host "ipmask $zero $($d.Subnet)"
+                # set gateway
+                Invoke-CrestronCommand -Device $d.Device -Command "defr$zero $($d.Gateway)" -secure  -Timeout 20
+                write-host "defr $zero $($d.Gateway)"
+                # check for host
+                if($d.Hostname)
+                {
+                    Invoke-CrestronCommand -Device $d.Device -Command "hostname $($d.Hostname)" -secure  -Timeout 20
+                    Write-Host "Hostname Set $($d.Hostname)"
+                }
+            }
+           
             Get-reboot_device
         }
     }

@@ -19,7 +19,7 @@ options.add_argument("disable-gpu")
 options.add_argument("--start-maximized")
 
 driver = webdriver.Chrome(options=options)
-driver.get("http://169.254.134.184")
+driver.get("http://10.5.20.225")
 
 try:
 
@@ -90,13 +90,34 @@ try:
 
         login_to_stream()
 
+        time.sleep(10)
+
         multicast_address_field = driver.find_element_by_css_selector("#txt_stream_MulticastAddressInput")
-        multicast_address_field.send_keys("test")
+        multicast_address_field.send_keys("239.255.254.86")
+
+        print("set multicast address TX")
+        
+        time.sleep(2)
+
+        stream_page_background = driver.find_element_by_css_selector("#val_stream_StreamLocation")
+        stream_page_background.click()
+
+        time.sleep(3)
 
         pass
     elif rx:
-        multicast_address_field = driver.find_element_by_css_selector("#txt_stream_MulticastAddressInput")
-        multicast_address_field.send_keys("test")
+        multicast_address_field = driver.find_element_by_css_selector("#txt_stream_StreamLocationInput")
+        multicast_address_field.send_keys("rtsp://10.5.20.222:554/live.sdp")
+
+        print("set multicast address RX")
+        
+        time.sleep(2)
+        
+        stream_page_background = driver.find_element_by_css_selector("#val_stream_MulticastAddress")
+        stream_page_background.click()
+
+
+        time.sleep(3)
 
 
         # add switch to extract for audio and set source.
